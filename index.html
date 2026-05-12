@@ -15,11 +15,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: background 0.6s;
     }
 
     .container {
       width: 100%;
-      max-width: 620px;           /* 넓이 조절 */
+      max-width: 640px;
       background: #111827;
       border-radius: 28px;
       border: 1px solid #334155;
@@ -48,12 +49,7 @@
       margin-bottom: 32px;
     }
 
-    .progress {
-      font-size: 2.8rem;
-      font-weight: 700;
-      color: #f8fafc;
-    }
-
+    .progress { font-size: 2.8rem; font-weight: 700; color: #f8fafc; }
     .score-box { text-align: right; }
     .score-label { font-size: 0.8rem; color: #94a3b8; }
     .score { font-size: 1.9rem; font-weight: 600; color: #34d399; }
@@ -102,11 +98,47 @@
     .word:hover { background: #475569; transform: translateY(-2px); }
     #answerArea .word { background: #475569; }
 
+    .hint-btn {
+      background: #334155;
+      color: #67e8f9;
+      border: 1px solid #475569;
+      padding: 10px 20px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+    }
+
+    .result {
+      margin: 25px 0;
+      padding: 30px 20px;
+      border-radius: 20px;
+      font-size: 2.2rem;
+      font-weight: 700;
+      text-align: center;
+      display: none;
+      line-height: 1.3;
+    }
+
+    .correct { background: #14532d; color: #4ade80; }
+    .wrong   { 
+      background: #991b1b; 
+      color: #fecaca; 
+      font-size: 2.5rem;
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+
     .buttons {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
-      margin-top: 32px;
+      margin-top: 10px;
     }
 
     button {
@@ -153,8 +185,12 @@
     <div class="section-label">답안 영역</div>
     <div id="answerArea"></div>
 
+    <button class="hint-btn" onclick="showHint()">힌트 보기</button>
+
     <div class="section-label">단어 선택</div>
     <div id="wordBank"></div>
+
+    <div id="result" class="result"></div>
 
     <div class="buttons">
       <button class="btn-reset" onclick="resetAnswer()">초기화</button>
@@ -163,76 +199,118 @@
   </div>
 </div>
 
+<canvas id="confetti" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none;"></canvas>
+
 <script>
+// Confetti 함수 (기존과 동일)
+function launchConfetti() {
+  const canvas = document.getElementById('confetti');
+  canvas.style.display = 'block';
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors = ['#f87171', '#fb923c', '#fbbf24', '#a78bfa', '#67e8f9'];
+  let particles = [];
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height - canvas.height;
+      this.size = Math.random() * 12 + 8;
+      this.speed = Math.random() * 7 + 5;
+      this.angle = Math.random() * 360;
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+    }
+    update() { this.y += this.speed; this.angle += 6; }
+    draw() {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle * Math.PI / 180);
+      ctx.fillStyle = this.color;
+      ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+      ctx.restore();
+    }
+  }
+
+  for (let i = 0; i < 180; i++) particles.push(new Particle());
+
+  let animation = setInterval(() => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach((p, i) => {
+      p.update();
+      p.draw();
+      if (p.y > canvas.height) particles.splice(i, 1);
+    });
+    if (particles.length === 0) {
+      clearInterval(animation);
+      canvas.style.display = 'none';
+    }
+  }, 20);
+}
+
 // ================== 문제 데이터 ==================
 let currentQuestion = 0;
 let score = 0;
 
 const questions = [
   {
-
-  //예시
     korean: "사회학자들은 이러한 과정을 '인종화'라고 부르기를 선호한다.",
     words: ["Sociologists", "prefer", "to", "call", "these", "processes", "'racialization'."],
     correct: ["Sociologists", "prefer", "to", "call", "these", "processes", "'racialization'."]
   }
-  // 문제 추가 해야함
 ];
 
 let selected = [];
 let originalWords = [];
-
-// ================== 유틸 함수 ==================
-function shuffle(array) {
-  return array.sort(() => Math.random() - 0.5);
-}
 
 // ================== 메인 함수 ==================
 function loadQuestion() {
   const q = questions[currentQuestion];
   originalWords = [...q.words];
   
+  // 배경 원래대로 복구
+  document.body.style.background = 'linear-gradient(135deg, #0f172a 0%, #1e2937 100%)';
+
   document.getElementById('progress').textContent = currentQuestion + 1;
   document.getElementById('score').textContent = score;
   document.getElementById('korean').textContent = q.korean;
+  document.getElementById('result').style.display = 'none';
 
   selected = [];
   renderWordBank();
   updateAnswerArea();
 }
 
-function renderWordBank() {
+function renderWordBank() { /* ... 기존과 동일 ... */ 
   const bank = document.getElementById('wordBank');
   bank.innerHTML = '';
-
-  const shuffled = shuffle([...originalWords]);
-  
-  shuffled.forEach(word => {
-    if (selected.includes(word)) return; // 이미 선택한 단어는 제외
-
+  const remaining = originalWords.filter(w => !selected.includes(w));
+  remaining.forEach(word => {
     const div = document.createElement('div');
     div.className = 'word';
     div.textContent = word;
-    div.onclick = () => selectWord(word, div);
+    div.onclick = () => selectWord(word);
     bank.appendChild(div);
   });
 }
 
-function selectWord(word, element) {
-  selected.push(word);
-  updateAnswerArea();
-  renderWordBank();        // bank 새로고침
+function selectWord(word) {
+  if (!selected.includes(word)) {
+    selected.push(word);
+    updateAnswerArea();
+    renderWordBank();
+  }
 }
 
-function updateAnswerArea() {
+function updateAnswerArea() { /* 기존과 동일 */ 
   const area = document.getElementById('answerArea');
   area.innerHTML = '';
-
   selected.forEach((word, i) => {
     const div = document.createElement('div');
     div.className = 'word';
     div.textContent = word;
-    div.onclick = () => removeWord(i);     // 해당 단어만 제거
+    div.onclick = () => removeWord(i);
     area.appendChild(div);
   });
 }
@@ -243,30 +321,48 @@ function removeWord(index) {
   renderWordBank();
 }
 
+function showHint() {
+  const area = document.getElementById('answerArea');
+  area.innerHTML = '';
+  questions[currentQuestion].correct.forEach((word, i) => {
+    const div = document.createElement('div');
+    div.className = 'word';
+    div.style.background = '#1e40af';
+    div.style.color = '#bfdbfe';
+    div.textContent = `${i+1}. ${word}`;
+    area.appendChild(div);
+  });
+}
+
 function checkAnswer() {
   const q = questions[currentQuestion];
   const userAnswer = selected.join(" ");
   const correctAnswer = q.correct.join(" ");
+  const resultEl = document.getElementById('result');
 
   if (userAnswer === correctAnswer) {
     score += 10;
     document.getElementById('score').textContent = score;
-    alert("정답입니다.");
-    if (currentQuestion < questions.length - 1) {
-      setTimeout(() => { currentQuestion++; loadQuestion(); }, 700);
-    }
+    resultEl.className = "result correct";
+    resultEl.textContent = "정답입니다!";
+    resultEl.style.display = 'block';
+    
+    setTimeout(() => {
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        loadQuestion();
+      }
+    }, 1400);
   } else {
-    alert(`오답입니다.\n\n정답: ${correctAnswer}`);
+    // ❌ 틀렸을 때 강렬 효과
+    document.body.style.background = '#991b1b';   // 전체 빨간색
+    launchConfetti();
     
-    // 오답 시 단어 위치 랜덤 섞기 (힌트)
-    renderWordBank();
+    resultEl.className = "result wrong";
+    resultEl.innerHTML = `틀렸습니다!<br><span style="font-size:1.1rem; opacity:0.9;">정답: ${correctAnswer}</span>`;
+    resultEl.style.display = 'block';
     
-    if (confirm("다시 풀어보시겠습니까?")) {
-      // 그대로 유지
-    } else if (currentQuestion < questions.length - 1) {
-      currentQuestion++;
-      loadQuestion();
-    }
+    setTimeout(showHint, 900);
   }
 }
 
