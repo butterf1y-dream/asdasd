@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>영어 어순 배열 연습</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>영어 단어 시험</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -11,367 +11,409 @@
       color: #e2e8f0;
       min-height: 100vh;
       margin: 0;
-      padding: 40px 20px;
+      padding: 20px 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.6s;
     }
-
     .container {
       width: 100%;
-      max-width: 640px;
+      max-width: 580px;
       background: #111827;
       border-radius: 28px;
       border: 1px solid #334155;
       overflow: hidden;
-      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
     }
-
     header {
       background: linear-gradient(to right, #1e2937, #334155);
-      padding: 32px 40px;
+      padding: 25px 20px;
       text-align: center;
     }
+    header h1 { margin: 0; font-size: 1.75rem; }
 
-    header h1 {
-      font-size: 1.65rem;
-      font-weight: 600;
-      margin: 0;
+    .content { padding: 30px 20px; text-align: center; }
+
+    .roulette {
+      font-size: 4.8rem;
+      font-weight: 900;
+      color: #67e8f9;
+      margin: 35px 0;
+      height: 130px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .roulette.spinning {
+      animation: spin 0.07s infinite linear;
+    }
+    @keyframes spin {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+      100% { transform: scale(1); }
     }
 
-    .content { padding: 40px; }
+    .start-btn {
+      background: #22d3ee;
+      color: #0f172a;
+      font-size: 1.25rem;
+      font-weight: 700;
+      padding: 18px 40px;
+      border-radius: 9999px;
+      cursor: pointer;
+      margin: 20px 0;
+      width: 85%;
+      max-width: 320px;
+    }
+
+    .confirm-text {
+      font-size: 1.45rem;
+      margin: 25px 0;
+      font-weight: 600;
+    }
 
     .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 32px;
+      display: flex; justify-content: space-between; margin-bottom: 25px;
+      font-size: 1.1rem;
     }
+    .progress { font-size: 2.4rem; font-weight: 700; }
 
-    .progress { font-size: 2.8rem; font-weight: 700; color: #f8fafc; }
-    .score-box { text-align: right; }
-    .score-label { font-size: 0.8rem; color: #94a3b8; }
-    .score { font-size: 1.9rem; font-weight: 600; color: #34d399; }
-
-    #korean {
+    #question {
       background: #1e2937;
+      padding: 25px 20px;
       border-radius: 20px;
-      padding: 32px;
-      font-size: 1.15rem;
-      line-height: 1.65;
-      margin-bottom: 36px;
+      font-size: 1.3rem;
+      margin-bottom: 25px;
       border: 1px solid #475569;
     }
 
-    .section-label {
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: #94a3b8;
-      margin-bottom: 10px;
-      padding-left: 8px;
-    }
-
-    #answerArea, #wordBank {
-      background: #0f172a;
-      border: 2px dashed #64748b;
-      border-radius: 20px;
-      padding: 24px;
-      min-height: 130px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-content: flex-start;
-    }
-
-    .word {
+    .options { display: flex; flex-direction: column; gap: 12px; }
+    .option {
       background: #334155;
-      color: #f1f5f9;
-      padding: 13px 24px;
+      padding: 18px;
       border-radius: 9999px;
+      font-size: 1.1rem;
       cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s;
-      white-space: nowrap;
     }
-
-    .word:hover { background: #475569; transform: translateY(-2px); }
-    #answerArea .word { background: #475569; }
-
-    .hint-btn {
-      background: #334155;
-      color: #67e8f9;
-      border: 1px solid #475569;
-      padding: 10px 20px;
-      border-radius: 9999px;
-      cursor: pointer;
-      font-size: 0.95rem;
-      margin-bottom: 20px;
-    }
+    .option:hover, .option:active { background: #475569; transform: scale(1.02); }
 
     .result {
-      margin: 25px 0;
-      padding: 30px 20px;
+      margin: 20px 0;
+      padding: 25px;
       border-radius: 20px;
-      font-size: 2.2rem;
+      font-size: 1.9rem;
       font-weight: 700;
-      text-align: center;
       display: none;
-      line-height: 1.3;
-    }
-
-    .correct { background: #14532d; color: #4ade80; }
-    .wrong   { 
-      background: #991b1b; 
-      color: #fecaca; 
-      font-size: 2.5rem;
-      animation: shake 0.5s;
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-8px); }
-      75% { transform: translateX(8px); }
     }
 
     .buttons {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-top: 10px;
+      gap: 12px;
+      margin-top: 15px;
     }
-
     button {
-      padding: 18px;
+      padding: 16px;
       font-size: 1.1rem;
-      font-weight: 500;
-      border-radius: 18px;
+      border-radius: 16px;
       cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-reset {
-      background: #334155;
-      color: white;
-      border: 1px solid #475569;
-    }
-
-    .btn-check {
-      background: #22d3ee;
-      color: #0f172a;
-      font-weight: 600;
     }
   </style>
 </head>
 <body>
-
 <div class="container">
-  <header><h1>영어 어순 배열 연습</h1></header>
+  <header><h1>영어 단어 시험</h1></header>
+  <div class="content" id="mainContent">
 
-  <div class="content">
-    <div class="top-bar">
-      <div>
-        <span class="progress" id="progress">1</span>
-        <small style="color:#64748b;"> / 10</small>
-      </div>
-      <div class="score-box">
-        <div class="score-label">점수</div>
-        <div class="score" id="score">0</div>
+    <div class="start-screen" id="startScreen">
+      <h2>두근두근</h2>
+      <p style="color:#94a3b8;">(총 127개 단어 중 랜덤)</p>
+      
+      <div class="roulette" id="roulette">75</div>
+      
+      <button class="start-btn" id="spinBtn" onclick="startSpinning()"> 두근두근 돌리기</button>
+      
+      <div id="confirmArea" style="display:none;">
+        <div class="confirm-text">
+          <strong><span id="selectedNum">75</span></strong>개 푸시네요
+        </div>
+        <button class="start-btn" onclick="startTest()" style="background:#4ade80;">✅ 시작하기</button>
       </div>
     </div>
 
-    <div id="korean"></div>
+    <div id="testScreen" style="display: none;">
+      <div class="top-bar">
+        <div><span class="progress" id="progress">1</span> / <span id="totalNum">0</span></div>
+        <div><span class="score" id="score">0</span>점</div>
+      </div>
 
-    <div class="section-label">답안 영역</div>
-    <div id="answerArea"></div>
+      <div id="question"></div>
+      <div class="options" id="options"></div>
+      <div id="result" class="result"></div>
 
-    <button class="hint-btn" onclick="showHint()">힌트 보기</button>
-
-    <div class="section-label">단어 선택</div>
-    <div id="wordBank"></div>
-
-    <div id="result" class="result"></div>
-
-    <div class="buttons">
-      <button class="btn-reset" onclick="resetAnswer()">초기화</button>
-      <button class="btn-check" onclick="checkAnswer()">확인하기</button>
+      <div class="buttons">
+        <button onclick="resetTest()" style="background:#334155; color:white;">처음으로</button>
+        <button id="nextBtn" onclick="nextQuestion()" style="display:none; background:#22d3ee; color:#0f172a;">다음 문제 →</button>
+      </div>
     </div>
   </div>
 </div>
 
-<canvas id="confetti" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none;"></canvas>
-
 <script>
-// Confetti 함수 (기존과 동일)
-function launchConfetti() {
-  const canvas = document.getElementById('confetti');
-  canvas.style.display = 'block';
-  const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  const colors = ['#f87171', '#fb923c', '#fbbf24', '#a78bfa', '#67e8f9'];
-  let particles = [];
-
-  class Particle {
-    constructor() {
-      this.x = Math.random() * canvas.width;
-      this.y = Math.random() * canvas.height - canvas.height;
-      this.size = Math.random() * 12 + 8;
-      this.speed = Math.random() * 7 + 5;
-      this.angle = Math.random() * 360;
-      this.color = colors[Math.floor(Math.random() * colors.length)];
-    }
-    update() { this.y += this.speed; this.angle += 6; }
-    draw() {
-      ctx.save();
-      ctx.translate(this.x, this.y);
-      ctx.rotate(this.angle * Math.PI / 180);
-      ctx.fillStyle = this.color;
-      ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
-      ctx.restore();
-    }
-  }
-
-  for (let i = 0; i < 180; i++) particles.push(new Particle());
-
-  let animation = setInterval(() => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach((p, i) => {
-      p.update();
-      p.draw();
-      if (p.y > canvas.height) particles.splice(i, 1);
-    });
-    if (particles.length === 0) {
-      clearInterval(animation);
-      canvas.style.display = 'none';
-    }
-  }, 20);
-}
-
-// ================== 문제 데이터 ==================
-let currentQuestion = 0;
-let score = 0;
-
-const questions = [
-  {
-    korean: "사회학자들은 이러한 과정을 '인종화'라고 부르기를 선호한다.",
-    words: ["Sociologists", "prefer", "to", "call", "these", "processes", "'racialization'."],
-    correct: ["Sociologists", "prefer", "to", "call", "these", "processes", "'racialization'."]
-  }
+// 단어127개 그냥 넣어버렷
+const wordBank = [
+  { eng: "perspective", kor: "관점" },
+  { eng: "infant", kor: "아기" },
+  { eng: "arrange", kor: "준비하다, 마련하다" },
+  { eng: "confidence", kor: "자신감" },
+  { eng: "anthropological", kor: "인류학적인" },
+  { eng: "conviction", kor: "확신" },
+  { eng: "coherent", kor: "일관된" },
+  { eng: "disordered", kor: "무질서한" },
+  { eng: "consensus", kor: "합의, 일치" },
+  { eng: "formulation", kor: "공식화" },
+  { eng: "emerge", kor: "나타나다" },
+  { eng: "credit", kor: "공로, 공적" },
+  { eng: "direction", kor: "지휘, 통솔" },
+  { eng: "meter", kor: "박자" },
+  { eng: "transition", kor: "전환" },
+  { eng: "aesthetic", kor: "미학적인" },
+  { eng: "be better off", kor: "~하는 편이 더 낫다" },
+  { eng: "be party to", kor: "~에 관여하다" },
+  { eng: "conductor", kor: "지휘자" },
+  { eng: "accompany", kor: "(~의) 반주를 하다" },
+  { eng: "highlight", kor: "강조하다" },
+  { eng: "consist of", kor: "~으로 구성되다" },
+  { eng: "be made up of", kor: "~으로 구성되다" },
+  { eng: "be composed of", kor: "~으로 구성되다" },
+  { eng: "comprehension", kor: "이해력" },
+  { eng: "prior knowledge", kor: "배경 지식" },
+  { eng: "enable", kor: "~이 …하게 하다" },
+  { eng: "outscore", kor: "~보다 더 높은 점수를 받다" },
+  { eng: "instructor", kor: "강사" },
+  { eng: "foster", kor: "조성하다" },
+  { eng: "cue", kor: "유도하다, 신호하다" },
+  { eng: "effortful", kor: "노력한, 정성이 들어간" },
+  { eng: "injury", kor: "부상" },
+  { eng: "conversely", kor: "반대로" },
+  { eng: "compassion", kor: "연민" },
+  { eng: "mindset", kor: "마음가짐" },
+  { eng: "evidently", kor: "분명히" },
+  { eng: "enhance", kor: "향상하다" },
+  { eng: "fundamental", kor: "기본적인" },
+  { eng: "device", kor: "기기" },
+  { eng: "with regard to", kor: "~에 관해서는" },
+  { eng: "precision", kor: "정밀도" },
+  { eng: "digit", kor: "자릿수, 숫자" },
+  { eng: "calculator", kor: "계산기" },
+  { eng: "visualize", kor: "시각화하다" },
+  { eng: "obtain", kor: "얻다" },
+  { eng: "curriculum", kor: "교육 과정" },
+  { eng: "stress", kor: "강조하다" },
+  { eng: "abstraction", kor: "추상화" },
+  { eng: "specific", kor: "특정한" },
+  { eng: "cluster", kor: "모으다, 무리로 만들다" },
+  { eng: "property", kor: "특성, 속성" },
+  { eng: "define", kor: "정의하다" },
+  { eng: "calculation", kor: "계산" },
+  { eng: "indicator", kor: "지표" },
+  { eng: "numerical", kor: "수치적인, 숫자와 관련된" },
+  { eng: "cognitive", kor: "인지의" },
+  { eng: "seed", kor: "씨앗" },
+  { eng: "crucial", kor: "중요한" },
+  { eng: "trigger", kor: "유발하다" },
+  { eng: "leading", kor: "선도적인" },
+  { eng: "investigate", kor: "연구하다, 조사하다" },
+  { eng: "do away with", kor: "~을 없애다" },
+  { eng: "up front", kor: "솔직하게" },
+  { eng: "roughly", kor: "대략" },
+  { eng: "control group", kor: "대조군" },
+  { eng: "modest", kor: "대단하지 않은" },
+  { eng: "make the point", kor: "~을 분명히 보여주다, 강조하다" },
+  { eng: "academia", kor: "학계" },
+  { eng: "come up with", kor: "~을 생각해 내다" },
+  { eng: "hypothesis", kor: "가설" },
+  { eng: "trail off", kor: "점점 감소하다, 차츰 잦아들다" },
+  { eng: "majority", kor: "대다수" },
+  { eng: "journalistic", kor: "언론의" },
+  { eng: "conclusion", kor: "결론" },
+  { eng: "groundbreaking", kor: "혁신적인" },
+  { eng: "perceptual", kor: "지각의" },
+  { eng: "context", kor: "(어떤 일의) 맥락, 전후 사정" },
+  { eng: "extraordinarily", kor: "대단히, 엄청나게" },
+  { eng: "adapt", kor: "적응시키다" },
+  { eng: "constantly", kor: "끊임없이" },
+  { eng: "uncertainty", kor: "불확실성" },
+  { eng: "multiple", kor: "여러, 다수의" },
+  { eng: "migrating bird", kor: "철새" },
+  { eng: "navigate", kor: "길을 찾다, 방향을 읽다" },
+  { eng: "landmark", kor: "주요 지형지물, 랜드마크" },
+  { eng: "magnetic", kor: "자성[자기]의, 자석의" },
+  { eng: "sufficient", kor: "충분한" },
+  { eng: "celebrity", kor: "유명인, 명사" },
+  { eng: "caricature", kor: "캐리커처" },
+  { eng: "stroke", kor: "(글씨나 그림의) 획" },
+  { eng: "recognition", kor: "인식, 인지" },
+  { eng: "immense", kor: "엄청난" },
+  { eng: "flexibility", kor: "유연성, 융통성" },
+  { eng: "administrator", kor: "행정관" },
+  { eng: "finalize", kor: "확정 짓다" },
+  { eng: "combination", kor: "조합, 결합" },
+  { eng: "intersect", kor: "교차하다" },
+  { eng: "inhabitable", kor: "사람이 거주 가능한" },
+  { eng: "patch", kor: "지역, 부분" },
+  { eng: "understandably", kor: "당연히" },
+  { eng: "colonial", kor: "식민지 시대의" },
+  { eng: "tear", kor: "떼어 놓다" },
+  { eng: "reflect", kor: "반영하다" },
+  { eng: "territory", kor: "영토" },
+  { eng: "in-group", kor: "내집단" },
+  { eng: "reference group", kor: "준거 집단" },
+  { eng: "evaluate", kor: "평가하다" },
+  { eng: "contribution", kor: "기여" },
+  { eng: "normative", kor: "규범의, 규범적인" },
+  { eng: "imitate", kor: "모방하다" },
+  { eng: "comparison", kor: "비교" },
+  { eng: "associative", kor: "연합의, 연상의" },
+  { eng: "positive", kor: "긍정적인" },
+  { eng: "self-esteem", kor: "자존감" },
+  { eng: "negative", kor: "부정적인" },
+  { eng: "performance", kor: "성과" },
+  { eng: "proximity", kor: "근접성" },
+  { eng: "element", kor: "요소" },
+  { eng: "pitch", kor: "(음의) 높이" },
+  { eng: "essentially", kor: "본질적으로" },
+  { eng: "simultaneously", kor: "동시에" },
+  { eng: "perceptually", kor: "지각적으로" },
+  { eng: "accompaniment", kor: "반주" },
+  { eng: "spatial", kor: "공간적인" },
+  { eng: "approximately", kor: "거의" },
+  { eng: "instrument", kor: "악기" }
 ];
 
-let selected = [];
-let originalWords = [];
+let selectedWords = [];
+let currentQuestion = 0;
+let score = 0;
+let currentCorrectAnswer = "";
+let answered = false;
+let totalQuestions = 0;
+let isSpinning = false;
 
-// ================== 메인 함수 ==================
-function loadQuestion() {
-  const q = questions[currentQuestion];
-  originalWords = [...q.words];
-  
-  // 배경 원래대로 복구
-  document.body.style.background = 'linear-gradient(135deg, #0f172a 0%, #1e2937 100%)';
+function startSpinning() {
+  if (isSpinning) return;
+  isSpinning = true;
 
-  document.getElementById('progress').textContent = currentQuestion + 1;
-  document.getElementById('score').textContent = score;
-  document.getElementById('korean').textContent = q.korean;
-  document.getElementById('result').style.display = 'none';
+  const roulette = document.getElementById('roulette');
+  const spinBtn = document.getElementById('spinBtn');
+  spinBtn.style.display = 'none';
 
-  selected = [];
-  renderWordBank();
-  updateAnswerArea();
+  roulette.classList.add('spinning');
+
+  let finalNum = 75;
+  let count = 0;
+
+  const interval = setInterval(() => {
+    finalNum = Math.floor(Math.random() * 51) + 50;
+    roulette.textContent = finalNum;
+    count++;
+    if (count > 42) {
+      clearInterval(interval);
+      roulette.classList.remove('spinning');
+      totalQuestions = finalNum;
+      document.getElementById('selectedNum').textContent = totalQuestions;
+      document.getElementById('confirmArea').style.display = 'block';
+      isSpinning = false;
+    }
+  }, 50);
 }
 
-function renderWordBank() { /* ... 기존과 동일 ... */ 
-  const bank = document.getElementById('wordBank');
-  bank.innerHTML = '';
-  const remaining = originalWords.filter(w => !selected.includes(w));
-  remaining.forEach(word => {
-    const div = document.createElement('div');
-    div.className = 'word';
-    div.textContent = word;
-    div.onclick = () => selectWord(word);
-    bank.appendChild(div);
-  });
-}
-
-function selectWord(word) {
-  if (!selected.includes(word)) {
-    selected.push(word);
-    updateAnswerArea();
-    renderWordBank();
-  }
-}
-
-function updateAnswerArea() { /* 기존과 동일 */ 
-  const area = document.getElementById('answerArea');
-  area.innerHTML = '';
-  selected.forEach((word, i) => {
-    const div = document.createElement('div');
-    div.className = 'word';
-    div.textContent = word;
-    div.onclick = () => removeWord(i);
-    area.appendChild(div);
-  });
-}
-
-function removeWord(index) {
-  selected.splice(index, 1);
-  updateAnswerArea();
-  renderWordBank();
-}
-
-function showHint() {
-  const area = document.getElementById('answerArea');
-  area.innerHTML = '';
-  questions[currentQuestion].correct.forEach((word, i) => {
-    const div = document.createElement('div');
-    div.className = 'word';
-    div.style.background = '#1e40af';
-    div.style.color = '#bfdbfe';
-    div.textContent = `${i+1}. ${word}`;
-    area.appendChild(div);
-  });
-}
-
-function checkAnswer() {
-  const q = questions[currentQuestion];
-  const userAnswer = selected.join(" ");
-  const correctAnswer = q.correct.join(" ");
-  const resultEl = document.getElementById('result');
-
-  if (userAnswer === correctAnswer) {
-    score += 10;
-    document.getElementById('score').textContent = score;
-    resultEl.className = "result correct";
-    resultEl.textContent = "정답입니다!";
-    resultEl.style.display = 'block';
-    
-    setTimeout(() => {
-      if (currentQuestion < questions.length - 1) {
-        currentQuestion++;
-        loadQuestion();
-      }
-    }, 1400);
-  } else {
-    // ❌ 틀렸을 때 강렬 효과
-    document.body.style.background = '#991b1b';   // 전체 빨간색
-    launchConfetti();
-    
-    resultEl.className = "result wrong";
-    resultEl.innerHTML = `틀렸습니다!<br><span style="font-size:1.1rem; opacity:0.9;">정답: ${correctAnswer}</span>`;
-    resultEl.style.display = 'block';
-    
-    setTimeout(showHint, 900);
-  }
-}
-
-function resetAnswer() {
+function startTest() {
+  selectedWords = [...wordBank].sort(() => Math.random() - 0.5).slice(0, totalQuestions);
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('testScreen').style.display = 'block';
+  document.getElementById('totalNum').textContent = totalQuestions;
+  currentQuestion = 0;
+  score = 0;
   loadQuestion();
 }
 
-// 시작
-loadQuestion();
+function loadQuestion() {
+  answered = false;
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'none';
+
+  const q = selectedWords[currentQuestion];
+  currentCorrectAnswer = q.eng;
+
+  document.getElementById('question').innerHTML = `
+    <strong>${q.kor}</strong><br>
+    <small style="color:#94a3b8; font-size:1rem;">위 뜻에 맞는 영어 단어는</small>
+  `;
+
+  const optionsDiv = document.getElementById('options');
+  optionsDiv.innerHTML = '';
+
+  let wrong = wordBank.filter(w => w.eng !== q.eng)
+                     .sort(() => Math.random() - 0.5)
+                     .slice(0, 4);
+
+  const options = [...wrong, q].sort(() => Math.random() - 0.5);
+
+  options.forEach(option => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.textContent = option.eng;
+    div.onclick = () => selectAnswer(option.eng, div);
+    optionsDiv.appendChild(div);
+  });
+
+  document.getElementById('progress').textContent = currentQuestion + 1;
+}
+
+function selectAnswer(selectedEng, element) {
+  if (answered) return;
+  answered = true;
+
+  const options = document.querySelectorAll('.option');
+  const isCorrect = selectedEng === currentCorrectAnswer;
+
+  options.forEach(opt => {
+    opt.style.pointerEvents = 'none';
+    if (opt.textContent === currentCorrectAnswer) opt.classList.add('correct');
+    if (opt.textContent === selectedEng && !isCorrect) opt.classList.add('wrong');
+  });
+
+  if (isCorrect) {
+    score += 10;
+    document.getElementById('score').textContent = score;
+  }
+
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('result').innerHTML = isCorrect 
+    ? " 정답!" 
+    : ` 오답<br><small>정답: <strong>${currentCorrectAnswer}</strong></small>`;
+
+  document.getElementById('nextBtn').style.display = 'block';
+}
+
+function nextQuestion() {
+  currentQuestion++;
+  if (currentQuestion >= totalQuestions) {
+    alert(`종료!\n\n최종 점수: ${score}점 / ${totalQuestions * 10}점`);
+    resetTest();
+  } else {
+    loadQuestion();
+  }
+}
+
+function resetTest() {
+  document.getElementById('testScreen').style.display = 'none';
+  document.getElementById('startScreen').style.display = 'block';
+  document.getElementById('confirmArea').style.display = 'none';
+  document.getElementById('spinBtn').style.display = 'block';
+  document.getElementById('roulette').textContent = '75';
+}
+
 </script>
 </body>
 </html>
