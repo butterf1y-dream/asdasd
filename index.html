@@ -15,6 +15,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: background 0.6s;
     }
     .container {
       width: 100%;
@@ -31,7 +32,6 @@
       text-align: center;
     }
     header h1 { margin: 0; font-size: 1.75rem; }
-
     .content { padding: 30px 20px; text-align: center; }
 
     .roulette {
@@ -105,7 +105,6 @@
       font-weight: 700;
       display: none;
     }
-
     .buttons {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -124,20 +123,19 @@
 <div class="container">
   <header><h1>영어 단어 시험</h1></header>
   <div class="content" id="mainContent">
-
     <div class="start-screen" id="startScreen">
       <h2>두근두근</h2>
       <p style="color:#94a3b8;">(총 127개 단어 중 랜덤)</p>
       
       <div class="roulette" id="roulette">75</div>
       
-      <button class="start-btn" id="spinBtn" onclick="startSpinning()"> 두근두근 돌리기</button>
+      <button class="start-btn" id="spinBtn" onclick="startSpinning()">두근두근 돌리기</button>
       
       <div id="confirmArea" style="display:none;">
         <div class="confirm-text">
-          <strong><span id="selectedNum">75</span></strong>개 푸시네요
+          <strong><span id="selectedNum">75</span></strong>개 ㅠ푸시네요
         </div>
-        <button class="start-btn" onclick="startTest()" style="background:#4ade80;">시좍하기</button>
+        <button class="start-btn" onclick="startTest()" style="background:#4ade80;">시작하기</button>
       </div>
     </div>
 
@@ -146,17 +144,17 @@
         <div><span class="progress" id="progress">1</span> / <span id="totalNum">0</span></div>
         <div><span class="score" id="score">0</span>점</div>
       </div>
-
       <div id="question"></div>
       <div class="options" id="options"></div>
       <div id="result" class="result"></div>
-
       <div class="buttons">
         <button id="nextBtn" onclick="nextQuestion()" style="display:none; background:#22d3ee; color:#0f172a;">다음 문제 →</button>
       </div>
     </div>
   </div>
 </div>
+
+<canvas id="confetti" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none;"></canvas>
 
 <script>
 // 단어127개 그냥 넣어버렷
@@ -298,14 +296,58 @@ let answered = false;
 let totalQuestions = 0;
 let isSpinning = false;
 
+// 폭죽 함수
+function launchConfetti() {
+  const canvas = document.getElementById('confetti');
+  canvas.style.display = 'block';
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const colors = ['#f87171', '#fb923c', '#fbbf24', '#a78bfa', '#67e8f9', '#f472b6'];
+  let particles = [];
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height - canvas.height;
+      this.size = Math.random() * 14 + 8;
+      this.speed = Math.random() * 8 + 6;
+      this.angle = Math.random() * 360;
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+    }
+    update() { this.y += this.speed; this.angle += 7; }
+    draw() {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle * Math.PI / 180);
+      ctx.fillStyle = this.color;
+      ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+      ctx.restore();
+    }
+  }
+
+  for (let i = 0; i < 220; i++) particles.push(new Particle());
+
+  let animation = setInterval(() => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach((p, i) => {
+      p.update();
+      p.draw();
+      if (p.y > canvas.height) particles.splice(i, 1);
+    });
+    if (particles.length === 0) {
+      clearInterval(animation);
+      canvas.style.display = 'none';
+    }
+  }, 20);
+}
+
 function startSpinning() {
   if (isSpinning) return;
   isSpinning = true;
-
   const roulette = document.getElementById('roulette');
   const spinBtn = document.getElementById('spinBtn');
   spinBtn.style.display = 'none';
-
   roulette.classList.add('spinning');
 
   let finalNum = 75;
@@ -385,20 +427,24 @@ function selectAnswer(selectedEng, element) {
   if (isCorrect) {
     score += 10;
     document.getElementById('score').textContent = score;
+  } else {
+    document.body.style.background = '#991b1b';
+    launchConfetti();
   }
 
   document.getElementById('result').style.display = 'block';
-  document.getElementById('result').innerHTML = isCorrect 
-    ? " 정답!" 
+  document.getElementById('result').innerHTML = isCorrect
+    ? " 정답"
     : ` 오답<br><small>정답: <strong>${currentCorrectAnswer}</strong></small>`;
 
   document.getElementById('nextBtn').style.display = 'block';
 }
 
 function nextQuestion() {
+  document.body.style.background = 'linear-gradient(135deg, #0f172a 0%, #1e2937 100%)';
   currentQuestion++;
   if (currentQuestion >= totalQuestions) {
-    alert(`종료!\n\n최종 점수: ${score}점 / ${totalQuestions * 10}점`);
+    alert(` 시험 끗\n\n최종 점수: ${score}점 / ${totalQuestions * 10}점`);
     resetTest();
   } else {
     loadQuestion();
@@ -406,13 +452,13 @@ function nextQuestion() {
 }
 
 function resetTest() {
+  document.body.style.background = 'linear-gradient(135deg, #0f172a 0%, #1e2937 100%)';
   document.getElementById('testScreen').style.display = 'none';
   document.getElementById('startScreen').style.display = 'block';
   document.getElementById('confirmArea').style.display = 'none';
   document.getElementById('spinBtn').style.display = 'block';
   document.getElementById('roulette').textContent = '75';
 }
-
 </script>
 </body>
 </html>
